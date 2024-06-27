@@ -4,4 +4,4 @@ psycopg2-binary
 requests
 azure-identity
 azure-keyvault-secrets
-azure-storage
+azure-storage-blob
