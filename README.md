@@ -14,16 +14,12 @@ This Flask-based web application securely retrieves configuration from Kubernete
 
 1. Start the application
 2. Initialize storage:
-   a. Retrieve encoded Key Vault address from Kubernetes secret
-   b. Decode the Key Vault address (base64 decoded twice)
-   c. Initialize Azure Key Vault client
-   d. Retrieve storage account name and key from Key Vault
-   e. Read data from local 'data.txt' file
-   f. Write data to Azure Blob Storage
-3. Start Flask web server
-4. On web request:
-   a. Read data from local 'data.txt' file
-   b. Display data on webpage
+3. Retrieve encoded Key Vault address from Kubernetes secret
+4. Retrieve storage account name and key from Key Vault
+5. Read data from local 'data.txt' file
+6. Write data to Azure Blob Storage
+7. Start Flask web server
+8. Display data on webpage
 
 # 🔄 Continuous Integration (CI) Workflow
 
