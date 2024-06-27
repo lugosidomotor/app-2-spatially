@@ -1,11 +1,9 @@
 from flask import Flask
 import os
 import base64
-import requests
-import psycopg2
-from kubernetes import client, config
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 app = Flask(__name__)
 
@@ -41,40 +39,38 @@ def get_keyvault_secret(vault_address, secret_name):
         print(f"Error accessing key vault: {e}")
         raise
 
-def create_table_if_not_exists(connection_string):
-    conn = psycopg2.connect(connection_string)
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS app_data (
-            id SERIAL PRIMARY KEY,
-            content TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
+def write_to_storage(account_name, account_key, container_name, blob_name, data):
+    try:
+        connection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net"
+        blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+        container_client = blob_service_client.get_container_client(container_name)
 
-def write_to_db(connection_string, data):
-    conn = psycopg2.connect(connection_string)
-    cur = conn.cursor()
-    create_table_if_not_exists(connection_string)
-    cur.execute("INSERT INTO app_data (content) VALUES (%s)", (data,))
-    conn.commit()
-    cur.close()
-    conn.close()
+        # Create the container if it does not exist
+        container_client.create_container()
 
-def initialize_database():
+        blob_client = container_client.get_blob_client(blob_name)
+        blob_client.upload_blob(data, overwrite=True)
+        print("Data written to storage successfully.")
+    except Exception as e:
+        print(f"Error writing to storage: {e}")
+        raise
+
+def initialize_storage():
     try:
         encoded_vault_address = get_kubernetes_secret("keyvault-address", "address")
         print(f"Encoded vault address: {encoded_vault_address}")
         vault_address = decode_base64_twice(encoded_vault_address)
         print(f"Decoded vault address: {vault_address}")
-        postgres_connection_string = get_keyvault_secret(vault_address, "postgres-connection-string")
-        print(f"Postgres connection string: {postgres_connection_string}")
+
+        storage_account_name = get_keyvault_secret(vault_address, "storage-account-name")
+        storage_account_key = get_keyvault_secret(vault_address, "storage-account-key")
+        print(f"Storage account name: {storage_account_name}")
+        print(f"Storage account key: {storage_account_key}")
+
         with open("data.txt", "r") as file:
             content = file.read()
-        write_to_db(postgres_connection_string, content)
-        print("Data written to database successfully.")
+
+        write_to_storage(storage_account_name, storage_account_key, "data", "data.txt", content)
     except Exception as e:
         print(f"Error: {str(e)}")
 
@@ -89,5 +85,5 @@ def hello_world():
     return f"<h1>app-2-spatially</h1><p>{content}</p>"
 
 if __name__ == "__main__":
-    initialize_database()
+    initialize_storage()
     app.run(host='0.0.0.0', port=8080, debug=True)
