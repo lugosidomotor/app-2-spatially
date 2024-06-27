@@ -8,22 +8,22 @@ https://github.com/lugosidomotor/app-1-spatially
 
 ## Overview
 
-This project is a Flask-based web application that reads data from a file, writes it to a PostgreSQL database, and displays it on a webpage. It also integrates with Kubernetes and Azure Key Vault for managing secrets.
+This Flask-based web application securely retrieves configuration from Kubernetes and Azure Key Vault, reads data from a local file, stores it in Azure Blob Storage, and displays it on a web page, demonstrating a cloud-native approach to data handling and web serving.
 
 ## Application Flow
 
-1. Start
-2. Read data from data.txt
-3. Initialize Kubernetes client
-4. Get Key Vault address from Kubernetes secret
-5. Decode Key Vault address
-6. Initialize Azure Key Vault client
-7. Get PostgreSQL connection string from Key Vault
-8. Connect to PostgreSQL database
-9. Create table if not exists
-10. Write data to database
-11. Start Flask web server
-12. Display data on webpage
+1. Start the application
+2. Initialize storage:
+   a. Retrieve encoded Key Vault address from Kubernetes secret
+   b. Decode the Key Vault address (base64 decoded twice)
+   c. Initialize Azure Key Vault client
+   d. Retrieve storage account name and key from Key Vault
+   e. Read data from local 'data.txt' file
+   f. Write data to Azure Blob Storage
+3. Start Flask web server
+4. On web request:
+   a. Read data from local 'data.txt' file
+   b. Display data on webpage
 
 # 🔄 Continuous Integration (CI) Workflow
 
