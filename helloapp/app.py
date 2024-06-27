@@ -1,9 +1,10 @@
 from flask import Flask
 import os
 import base64
+from kubernetes import client, config
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from azure.storage.blob import BlobServiceClient
 
 app = Flask(__name__)
 
