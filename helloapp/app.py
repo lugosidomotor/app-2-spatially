@@ -86,7 +86,7 @@ def hello_world():
     except FileNotFoundError:
         content = "Data file not found."
 
-    return f"<h1>app-1-spatially</h1><p>{content}</p>"
+    return f"<h1>app-2-spatially</h1><p>{content}</p>"
 
 if __name__ == "__main__":
     initialize_database()

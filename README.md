@@ -1,6 +1,6 @@
 # 💻 🔗
 
-# 💻 app-1-spatially
+# 💻 app-2-spatially
 
 ## Overview
 

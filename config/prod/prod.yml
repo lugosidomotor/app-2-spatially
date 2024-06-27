@@ -1,32 +1,33 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-1-spatially-service
+  name: app-2-spatially-service
 spec:
   selector:
-    app: app-1-spatially
+    app: app-2-spatially
   ports:
     - protocol: "TCP"
       port: 8080
-  type: NodePort
+      targetPort: 8080
+  type: LoadBalancer
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-1-spatially
+  name: app-2-spatially
 spec:
   selector:
     matchLabels:
-      app: app-1-spatially
+      app: app-2-spatially
   replicas: 4
   template:
     metadata:
       labels:
-        app: app-1-spatially
+        app: app-2-spatially
     spec:
       containers:
-        - name: app-1-spatially
+        - name: app-2-spatially
           image: ldomotor/app1spatially:974248f
           ports:
             - containerPort: 8080
